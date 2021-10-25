@@ -106,6 +106,11 @@
     span {
         margin-right: 15px;
         font-weight: 900;
+        margin-left: 2%;
+        font-size: 16px;
+        color: white;
+        cursor: pointer;
+        z-index: 1;
     }
 
     #listByCat {
@@ -120,8 +125,40 @@
         width: 100%;
         height: 300px;
     }
-
-
+    #name {
+        visibility: hidden;
+        display: inline-block;
+        width: 8%;
+    }
+    #signupDiv, #loginDiv {
+        width: 50%;
+        height: 400px;
+        background-color: black;
+        position: fixed;
+        top: 80px;
+        left: 25%;
+        box-sizing: border-box;
+        padding: 2% 17%;
+        text-align: center;
+        display: none;
+    }
+    #signupDiv button, #loginDiv button {
+        width: 40%;
+        margin-top: 5%;
+    }
+    .closebtn {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border: none;
+        outline: none;
+        background-color: red;
+        position: fixed;
+        bottom: 82%;
+        text-align: center;
+        left: 72%;
+        cursor: pointer;
+    }
   </style>
   <body>
     <div>
@@ -129,11 +166,85 @@
         <button onclick="showPopular()">Popular</button>
         <button onclick="showTop()">Top Rated</button>
         <button onclick="showUpcoming()">Upcoming</button>
+        <span id="in">Log-In</span>
+        <span id="up">Sign-Up</span>
+        <div id="name">
+            <span>Hi, Prakhar</span>
+        </div>
         <div id="movies"></div>
     </div>
     
     <div id="display"></div>
     <div id="listByCat"></div>
+    <div id="loginDiv">
+        <form onsubmit="login(event)">
+            <table>
+                <tr>
+                    <td>
+                        <input placeholder="Username"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="password" placeholder="Enter Password"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit">Submit</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <input value="X" class="closebtn" readonly = "readonly">
+    </div>
+    <div id="signupDiv">
+        <form onsubmit="signup(event)">
+            <table>
+                <tr>
+                    <td>
+                        <input placeholder="Enter your name"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input placeholder="Enter your Email"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input placeholder="Username"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="password" placeholder="Enter Password"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="password" placeholder="Retype Password"/>
+                    </td> 
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" placeholder="Enter your mobile number"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input placeholder="Description"/>
+                    </td> 
+                </tr>
+                <tr>
+                    <td>
+                        <button type="submit">Submit</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <input value="X" class="closebtn" readonly = "readonly">
+    </div>
   </body>
 </html>
 
@@ -146,6 +257,20 @@
     let listByCategory = document.getElementById("listByCat");
 
     let X = ["red", "green", "orange", "yellow", "purple", "tomato", "teal", "chocolate", "coral", "crimson", "darkmagenta"];
+
+    let signupBtn = document.getElementById("up");
+
+    let loginBtn = document.getElementById("in");
+
+    let signupSec = document.getElementById("signupDiv");
+
+    let loginSec = document.getElementById("loginDiv");
+
+    let closingBtn = document.getElementsByClassName("closebtn");
+
+    let details = document.getElementsByTagName("input");
+
+    let Name = document.getElementById("name");
 
     async function searchMovies(movie_name) {
         let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=8854a615ae3445959d40f25a62dfa9b7&language=en-US&query=${movie_name}&page=1&include_adult=false`);
@@ -371,5 +496,106 @@
     }
 
     showPopular();
+
+    signupBtn.onclick = function() {
+        displaySignup();
+    }
+
+    function displaySignup() {
+        signupSec.style.display = "block";
+    }
+
+    loginBtn.onclick = function() {
+        displayLogin();
+    }
+
+    function displayLogin() {
+        loginSec.style.display = "block";
+    }
+
+    closingBtn[0].onclick = function() {
+        closeLogin();
+    }
+
+    function closeLogin() {
+        loginSec.style.display = "none";
+    }
+
+    closingBtn[1].onclick = function() {
+        closeSignup();
+    }
+
+    function closeSignup() {
+        signupSec.style.display = "none";
+    }
+
+    
+   async function signup(event) {
+        event.preventDefault();
+
+        let user_data = {
+            name: details[4].value,
+            email: details[5].value,
+            password: details[7].value,
+            username: details[6].value,
+            mobile: details[9].value,
+            description: details[10].value,
+        };
+
+        user_data = JSON.stringify(user_data);
+
+       let res = await fetch("https://masai-api-mocker.herokuapp.com/auth/register", {
+            method:'POST',
+            body:user_data,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        let data = await res.json();
+
+        alert(data.message);
+        signupSec.style.display = "none";
+        
+
+    }
+
+    async function login(event) {
+        event.preventDefault();
+
+        let user_data = {
+            username: details[1].value,
+            password: details[2].value,
+        };
+
+        data_send = JSON.stringify(user_data);
+
+        console.log(data_send);
+
+       let res = await fetch("https://masai-api-mocker.herokuapp.com/auth/login", {
+            method:'POST',
+            body:data_send,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        let data = await res.json();
+
+        loginSec.style.display = "none";
+
+        loginBtn.style.display = "none";
+
+        signupBtn.style.display = "none";
+
+        Name.style.visibility = "visible";
+
+        Name.style.position = "absolute";
+
+        Name.style.top = "3%";
+
+        Name.style.left = "90%";
+        
+        Name.style.zIndex = "2";
+
+    }  
 
 </script>
